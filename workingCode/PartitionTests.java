@@ -70,7 +70,7 @@ public class PartitionTests {
 //            constraints                 // Constraints all meetings must satisfy
 //        );
         
-        Partitioner.Partition(11);
+        Partitioner.Partition(4);
 //        SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(5, 5);
 //        Squaretopia.show();
 //        System.out.println(""); // delete
