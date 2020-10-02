@@ -34,9 +34,15 @@ final public class SquaretopiaMatrix {
     
     // print matrix to standard output
     public void show() {
-        for (int i = 0; i < M; i++) {
-            for (int j = 0; j < N; j++) { 
-                System.out.print(" " + data[i][j].districtNumber);
+        for (int i = 1; i < M - 1; i++) { // exclude perimeter of -1s
+            for (int j = 1; j < N - 1; j++) {
+                int districtNum = data[i][j].districtNumber;
+                if(districtNum >= 0 && districtNum <= 9) {
+                    System.out.print("   " + data[i][j].districtNumber);
+                }
+                else {
+                    System.out.print("  " + data[i][j].districtNumber);
+                }
             }
             System.out.print("");
             System.out.println("");
@@ -172,5 +178,5 @@ final public class SquaretopiaMatrix {
 }
 
 
-// Copyright © 2000–2017, Robert Sedgewick and Kevin Wayne.
+// Copyright Â© 2000â€“2017, Robert Sedgewick and Kevin Wayne.
 // Last updated: Fri Oct 20 14:12:12 EDT 2017.
