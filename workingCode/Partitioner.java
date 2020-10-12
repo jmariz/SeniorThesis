@@ -16,50 +16,53 @@ public class Partitioner {
      */
     
     // sets everything up
-    public static void Partition (int size) {
+    public static void Partition (int size, int numOfTrials) {
         int adjustedSize = size + 2;
-        SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
-        Squaretopia.show();
-        Set<SquaretopiaState> freeSquares = generateSetOfFreeStates(Squaretopia);
-        System.out.println("freeSquares.size(): " + freeSquares.size()); // delete
-        Set<SquaretopiaState> currentDistrict = new HashSet<>();
-        Set<SquaretopiaState> currentDistrictFreeNeighbors = new HashSet<>();
-        Set<SquaretopiaState> recentlyAddedTransitions = new HashSet<>();
-        SquaretopiaState claimedState;
-//        currentDistrict.add(claimedState);
-        while(freeSquares.size() > 0) {
-            claimedState = deadEnd(Squaretopia, freeSquares);
-            if(claimedState == null) {
-                claimedState = randomState(freeSquares);
+        
+        for(int i = 0; i < numOfTrials; i++) {
+            SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
+            // Squaretopia.show();
+            Set<SquaretopiaState> freeSquares = generateSetOfFreeStates(Squaretopia);
+            // System.out.println("freeSquares.size(): " + freeSquares.size()); // delete
+            Set<SquaretopiaState> currentDistrict = new HashSet<>();
+            Set<SquaretopiaState> currentDistrictFreeNeighbors = new HashSet<>();
+            Set<SquaretopiaState> recentlyAddedTransitions = new HashSet<>();
+            SquaretopiaState claimedState;
+    //        currentDistrict.add(claimedState);
+            while(freeSquares.size() > 0) {
+                claimedState = deadEnd(Squaretopia, freeSquares);
+                if(claimedState == null) {
+                    claimedState = randomState(freeSquares);
+                }
+                // claimedState = randomState(freeSquares);
+                claimer(Squaretopia, freeSquares, currentDistrict, claimedState);
+                
+                currentDistrictFreeNeighbors.addAll(getTransitions(Squaretopia, claimedState));
+                recentlyAddedTransitions.addAll(getTransitions(Squaretopia, claimedState));
+                // System.out.println("currentDistrictFreeNeighbors.size(): " + currentDistrictFreeNeighbors.size()); // delete
+                // System.out.println("recentlyAddedTransitions.size(): " + recentlyAddedTransitions.size()); // delete
+                if (recursiveDistricter(Squaretopia, freeSquares, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions) == null) {
+                    System.out.println("NO SOLUTION!"); // delete;
+                    break;
+                }
+                // System.out.println("finished one district!"); // delete
+                // Squaretopia.checkers(); // delete
+                currentDistrict.clear();
+                currentDistrictFreeNeighbors.clear();
+                // System.out.println("currentDistrict.size(): " + currentDistrict.size()); // delete
+                // System.out.println("end of while loop"); // delete
+                // currentDistrict.removeAll(currentDistrict);
+    //            if(freeSquares.size() != 0) {
+    //                claimedState = randomState(freeSquares);
+    //                freeSquares.remove(claimedState);
+    //                updateMatrix(Squaretopia, freeSquares, claimedState);
+    //                currentDistrict.add(claimedState);
+    //            }
             }
-            // claimedState = randomState(freeSquares);
-            claimer(Squaretopia, freeSquares, currentDistrict, claimedState);
-            
-            currentDistrictFreeNeighbors.addAll(getTransitions(Squaretopia, claimedState));
-            recentlyAddedTransitions.addAll(getTransitions(Squaretopia, claimedState));
-            System.out.println("currentDistrictFreeNeighbors.size(): " + currentDistrictFreeNeighbors.size()); // delete
-            System.out.println("recentlyAddedTransitions.size(): " + recentlyAddedTransitions.size()); // delete
-            if (recursiveDistricter(Squaretopia, freeSquares, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions) == null) {
-                System.out.println("NO SOLUTION!"); // delete;
-                break;
-            }
-            System.out.println("finished one district!"); // delete
-            Squaretopia.checkers(); // delete
-            currentDistrict.clear();
-            currentDistrictFreeNeighbors.clear();
-            System.out.println("currentDistrict.size(): " + currentDistrict.size()); // delete
-            System.out.println("end of while loop"); // delete
-            // currentDistrict.removeAll(currentDistrict);
-//            if(freeSquares.size() != 0) {
-//                claimedState = randomState(freeSquares);
-//                freeSquares.remove(claimedState);
-//                updateMatrix(Squaretopia, freeSquares, claimedState);
-//                currentDistrict.add(claimedState);
-//            }
+            Squaretopia.show();
+            // lengthWidthScore(Squaretopia);
+            areaToMinBoundSquare(Squaretopia);
         }
-        Squaretopia.show();
-        System.out.println("reached end of recursion :) "); // delete
-        lengthWidthScore(Squaretopia);
         
     }
     
@@ -79,20 +82,20 @@ public class Partitioner {
     public static SquaretopiaState randomState(Set<SquaretopiaState> set) {
         SquaretopiaState chosenState = new SquaretopiaState(-1, -1);
         int numOfStates = set.size();
-        System.out.println("number of choices for current state: " + numOfStates); // delete
+        // System.out.println("number of choices for current state: " + numOfStates); // delete
         int chosenStateIndex = (int) Math.ceil((Math.random() * numOfStates));
         Iterator<SquaretopiaState> it = set.iterator();
         // System.out.println("chosenStateIndex: " + chosenStateIndex); // delete
         for (int i = 0; i < chosenStateIndex; i++) {
             chosenState = it.next();
         }
-        System.out.println("chose this state: " + chosenState.toString()); // delete
+        // System.out.println("chose this state: " + chosenState.toString()); // delete
         return chosenState;
     }
     
     // determine which district we are constructing
     public static int getCurrentDistrictNumber(SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates) {
-        System.out.println("freeStates.size(): " + freeStates.size()); // delete
+        // System.out.println("freeStates.size(): " + freeStates.size()); // delete
         int n = matrix.data.length - 2; // assumes matrix is a square and subtract 2 because of outer layer
         int currentDistrictNumber = (int) Math.ceil( Double.valueOf(n * n - freeStates.size()) / n );
         return currentDistrictNumber;
@@ -151,18 +154,18 @@ public class Partitioner {
             matrix.data[claimedState.row][claimedState.col].districtNumber = 0;
             matrix.data[claimedState.row][claimedState.col].checked = false;
         }
-        matrix.show(); // delete
+        // matrix.show(); // delete
         return matrix;
     }
     
     // recursion algorithm
     public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, Set<SquaretopiaState> currentDistrict, Set<SquaretopiaState> allPossibleTransitions, Set<SquaretopiaState> recentlyAddedTransitions) {
           if(currentDistrict.size() == (matrix.data.length - 2)) { // assumes matrix is a square
-              System.out.println("valid map? " + matrix.validMap(matrix)); // delete
+              // System.out.println("valid map? " + matrix.validMap(matrix)); // delete
               if(matrix.validMap(matrix)) {
                   recentlyAddedTransitions.clear();
-                  System.out.println("currentDistrict.size() in if just cleared: " + currentDistrict.size()); // delete
-                  System.out.println("valid map!"); // delete
+                  // System.out.println("currentDistrict.size() in if just cleared: " + currentDistrict.size()); // delete
+                  // System.out.println("valid map!"); // delete
                   return matrix;
               } else {
                   allPossibleTransitions.removeAll(recentlyAddedTransitions);
@@ -187,30 +190,30 @@ public class Partitioner {
               if(nextState == null) {
                   nextState = randomState(newAllPossibleNeighbors);
               }
-              System.out.println("nextState... " + nextState.toString()); // delete
+              // System.out.println("nextState... " + nextState.toString()); // delete
               claimer(matrix, freeStates, currentDistrict, nextState);
               newAllPossibleNeighbors.remove(nextState);
               newRecentlyAddedTransitions = recentlyAddedTransitions(newAllPossibleNeighbors, getTransitions(matrix, nextState));
-              System.out.println("recentlyAddedTransitions.size(): " + newRecentlyAddedTransitions.size()); // delete
+              // System.out.println("recentlyAddedTransitions.size(): " + newRecentlyAddedTransitions.size()); // delete
               newAllPossibleNeighbors.addAll(getTransitions(matrix, nextState));
-              System.out.println("newAllPossibleNeighbors.size(): " + newAllPossibleNeighbors.size()); // delete
-              for(SquaretopiaState state : newAllPossibleNeighbors) { // delete
-                  System.out.println(state.toString()); // delete
-              }
-              System.out.println(""); // delete
-              System.out.println(""); // delete
-              System.out.println(""); // delete
+              // System.out.println("newAllPossibleNeighbors.size(): " + newAllPossibleNeighbors.size()); // delete
+              // for(SquaretopiaState state : newAllPossibleNeighbors) { // delete
+                  // System.out.println(state.toString()); // delete
+              // }
+              // System.out.println(""); // delete
+              // System.out.println(""); // delete
+              // System.out.println(""); // delete
               if(recursiveDistricter(matrix, freeStates, currentDistrict, newAllPossibleNeighbors, newRecentlyAddedTransitions) == null) {
-                  System.out.println("came back to line 200"); // delete
+                  // System.out.println("came back to line 200"); // delete
                   newAllPossibleNeighbors.remove(nextState);
                   returner(matrix, freeStates, currentDistrict, nextState);
                   newAllPossibleNeighbors.removeAll(newRecentlyAddedTransitions);
               } else {
                   return matrix;
               }
-              System.out.println("reached end of while loop in recurser"); // delete
+              // System.out.println("reached end of while loop in recurser"); // delete
           }
-          System.out.println("returning null from the end of the recurser..."); // delete
+          // System.out.println("returning null from the end of the recurser..."); // delete
           return null;
     }
     
@@ -262,8 +265,9 @@ public class Partitioner {
     // calculates the sum of the length-width ratios for all districts in a given Squaretopia 
     public static double lengthWidthScore(SquaretopiaMatrix matrix) {
         // locate and save extrema states
-        double score = 0;
-        SquaretopiaState[][] extrema = new SquaretopiaState[matrix.data.length - 2][4]; // each district has four states in this order min length, max length, min width, max width
+        double scoreTotal = 0;
+        double numOfDistricts = matrix.data.length - 2;
+        SquaretopiaState[][] extrema = new SquaretopiaState[(int) numOfDistricts][4]; // each district has four states in this order min length, max length, min width, max width
         for (int i = 1; i < matrix.data.length - 1; i++) {
             for (int j = 1; j < matrix.data.length - 1; j++) {
                 int districtNumberOfThisState = matrix.data[i][j].districtNumber;
@@ -290,29 +294,97 @@ public class Partitioner {
         }
         double length;
         double width;
+//        for (int i = 0; i < extrema.length; i++) {
+//            System.out.println("district " + (i + 1)); // delete
+//            System.out.println("min row: " + extrema[i][0].toString()); // delete
+//            System.out.println("max row: " + extrema[i][1].toString()); // delete
+//            System.out.println("min col: " + extrema[i][2].toString()); // delete
+//            System.out.println("max col: " + extrema[i][3].toString()); // delete
+//            System.out.println(""); // delete
+//            System.out.println(""); // delete
+//        }
         for (int i = 0; i < extrema.length; i++) {
-            System.out.println("district " + (i + 1)); // delete
-            System.out.println("min row: " + extrema[i][0].toString()); // delete
-            System.out.println("max row: " + extrema[i][1].toString()); // delete
-            System.out.println("min col: " + extrema[i][2].toString()); // delete
-            System.out.println("max col: " + extrema[i][3].toString()); // delete
-            System.out.println(""); // delete
-            System.out.println(""); // delete
-        }
-        for (int i = 0; i < extrema.length; i++) {
+            // System.out.println("for district " + (i + 1) + " ..."); // delete
             length = Math.abs(extrema[i][0].row - extrema[i][1].row) + 1; // add one to count properly
-            System.out.println("length: " + length); // delete
+            // System.out.println("length: " + length); // delete
             width = Math.abs(extrema[i][2].col - extrema[i][3].col) + 1;
-            System.out.println("width: " + width); // delete
+            // System.out.println("width: " + width); // delete
             if (length < width) {
-                System.out.println("district " + (i + 1) +  " score: " + length / width); // delete
-                score += length / width;
+                // System.out.println("district " + (i + 1) +  " score: " + length / width); // delete
+                // System.out.println("-----"); // delete
+                scoreTotal += length / width;
             } else {
-                System.out.println("district " + (i + 1) +  " score: " + width / length); // delete
-                score += width / length;
+                // System.out.println("district " + (i + 1) +  " score: " + width / length); // delete
+                // System.out.println("-----"); // delete
+                scoreTotal += width / length;
             }
         }
-        System.out.println("length-width score: " + score); // delete
-        return score;
+        double averageScore = scoreTotal / numOfDistricts;
+        System.out.println(averageScore); // delete
+        // System.out.println("\n\n\n"); // delete
+        return averageScore;
+    }
+    
+    // calculates the district area to minimum bounding square ratios for all districts in a given Squaretopia 
+    public static double areaToMinBoundSquare(SquaretopiaMatrix matrix) {
+        // locate and save extrema states
+        double scoreTotal = 0;
+        double numOfDistricts = matrix.data.length - 2;
+        SquaretopiaState[][] extrema = new SquaretopiaState[(int) numOfDistricts][4]; // each district has four states in this order min length, max length, min width, max width
+        for (int i = 1; i < matrix.data.length - 1; i++) {
+            for (int j = 1; j < matrix.data.length - 1; j++) {
+                int districtNumberOfThisState = matrix.data[i][j].districtNumber;
+                SquaretopiaState thisState = matrix.data[i][j];
+                if(extrema[districtNumberOfThisState - 1][0] == null) {
+                    extrema[districtNumberOfThisState - 1][0] = thisState;
+                    extrema[districtNumberOfThisState - 1][1] = thisState;
+                    extrema[districtNumberOfThisState - 1][2] = thisState;
+                    extrema[districtNumberOfThisState - 1][3] = thisState;
+                }
+                if(thisState.row < extrema[districtNumberOfThisState - 1][0].row) {
+                    extrema[districtNumberOfThisState - 1][0] = thisState;
+                }
+                if(thisState.row > extrema[districtNumberOfThisState - 1][1].row) {
+                    extrema[districtNumberOfThisState - 1][1] = thisState;
+                }
+                if(thisState.col < extrema[districtNumberOfThisState - 1][2].col) {
+                    extrema[districtNumberOfThisState - 1][2] = thisState;
+                }
+                if(thisState.col > extrema[districtNumberOfThisState - 1][3].col) {
+                    extrema[districtNumberOfThisState - 1][3] = thisState;
+                }
+            }
+        }
+        double length;
+        double width;
+//        for (int i = 0; i < extrema.length; i++) {
+//            System.out.println("district " + (i + 1)); // delete
+//            System.out.println("min row: " + extrema[i][0].toString()); // delete
+//            System.out.println("max row: " + extrema[i][1].toString()); // delete
+//            System.out.println("min col: " + extrema[i][2].toString()); // delete
+//            System.out.println("max col: " + extrema[i][3].toString()); // delete
+//            System.out.println(""); // delete
+//            System.out.println(""); // delete
+//        }
+        for (int i = 0; i < extrema.length; i++) {
+            // System.out.println("for district " + (i + 1) + " ..."); // delete
+            length = Math.abs(extrema[i][0].row - extrema[i][1].row) + 1; // add one to count properly
+            // System.out.println("length: " + length); // delete
+            width = Math.abs(extrema[i][2].col - extrema[i][3].col) + 1;
+            // System.out.println("width: " + width); // delete
+            if (length < width) {
+                System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (width * width)); // delete
+                System.out.println("-----"); // delete
+                scoreTotal += numOfDistricts / (width * width);
+            } else {
+                System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (length * length)); // delete
+                System.out.println("-----"); // delete
+                scoreTotal += numOfDistricts / (length * length);
+            }
+        }
+        double averageScore = scoreTotal / numOfDistricts;
+        System.out.println(averageScore); // delete
+        System.out.println("\n\n\n"); // delete
+        return averageScore;
     }
 }
