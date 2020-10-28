@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.jdi.DoubleValue;
+
 /**
  * Partition
  */
@@ -60,8 +62,9 @@ public class Partitioner {
     //            }
             }
             Squaretopia.show();
+            Schwartzberg(Squaretopia);
             // lengthWidthScore(Squaretopia);
-            areaToMinBoundSquare(Squaretopia);
+            // Reock(Squaretopia);
         }
         
     }
@@ -76,6 +79,40 @@ public class Partitioner {
             }
         }
         return setOfStates;
+    }
+    
+    // calculate the perimeters of each district in a partition
+    public static int[] calculatePerimeters(SquaretopiaMatrix matrix) {
+        int numOfDistricts = matrix.data.length - 2;
+        int[] perimetersArray = new int[numOfDistricts];
+        for(int i = 0; i < numOfDistricts; i++) {
+            perimetersArray[i] = 4 * numOfDistricts;
+        }
+        System.out.println(""); // delete
+        for(int i = 1; i < matrix.data.length - 1; i++) {
+            for(int j = 1; j < matrix.data.length - 1; j++) {
+                int districtNumOfCurrentState = matrix.data[i][j].districtNumber;
+                if(districtNumOfCurrentState == matrix.data[i - 1][j].districtNumber) {
+                    perimetersArray[districtNumOfCurrentState - 1]--;
+                }
+                if(districtNumOfCurrentState == matrix.data[i + 1][j].districtNumber) {
+                    perimetersArray[districtNumOfCurrentState - 1]--;
+                }
+                if(districtNumOfCurrentState == matrix.data[i][j - 1].districtNumber) {
+                    perimetersArray[districtNumOfCurrentState - 1]--;
+                }
+                if(districtNumOfCurrentState == matrix.data[i][j + 1].districtNumber) {
+                    perimetersArray[districtNumOfCurrentState - 1]--;
+                }
+            }
+        }
+        
+        System.out.println("PerimetersArray"); // delete
+        for(int i = 0; i < perimetersArray.length; i++) { // delete
+            System.out.print(perimetersArray[i] + " "); // delete
+        }
+        System.out.println(""); // delete
+        return perimetersArray;
     }
     
     // pick a random state from the set of free states
@@ -326,7 +363,7 @@ public class Partitioner {
     }
     
     // calculates the district area to minimum bounding square ratios for all districts in a given Squaretopia 
-    public static double areaToMinBoundSquare(SquaretopiaMatrix matrix) {
+    public static double Reock(SquaretopiaMatrix matrix) {
         // locate and save extrema states
         double scoreTotal = 0;
         double numOfDistricts = matrix.data.length - 2;
@@ -381,6 +418,36 @@ public class Partitioner {
                 System.out.println("-----"); // delete
                 scoreTotal += numOfDistricts / (length * length);
             }
+        }
+        double averageScore = scoreTotal / numOfDistricts;
+        System.out.println(averageScore); // delete
+        System.out.println("\n\n\n"); // delete
+        return averageScore;
+    }
+    
+    // calculates the ratio of the district area to the area of a square with perimeter equal to the district's perimeter for all districts in a given Squaretopia
+    public static double PolsbyPopper(SquaretopiaMatrix matrix) {
+        int[] perimetersArray = calculatePerimeters(matrix); 
+        double scoreTotal = 0;
+        int numOfDistricts = matrix.data.length - 2;
+        double areaOfADistrict = matrix.data.length - 2;
+        for(int i = 0; i < perimetersArray.length; i++) {
+            scoreTotal += areaOfADistrict / Math.pow(Double.valueOf(perimetersArray[i]) / 4, 2);
+        }
+        double averageScore = scoreTotal / numOfDistricts;
+        System.out.println(averageScore); // delete
+        System.out.println("\n\n\n"); // delete
+        return averageScore;
+    }
+    
+    // calculates the ratio of the district perimeter to the perimeter of a square with area equal to the district's area for all districts in a given Squaretopia
+    public static double Schwartzberg(SquaretopiaMatrix matrix) {
+        int[] perimetersArray = calculatePerimeters(matrix); 
+        double scoreTotal = 0;
+        int numOfDistricts = matrix.data.length - 2;
+        double areaOfADistrict = matrix.data.length - 2;
+        for(int i = 0; i < perimetersArray.length; i++) {
+            scoreTotal += (4 * Math.sqrt(Double.valueOf(areaOfADistrict))) / Double.valueOf(perimetersArray[i]);
         }
         double averageScore = scoreTotal / numOfDistricts;
         System.out.println(averageScore); // delete
