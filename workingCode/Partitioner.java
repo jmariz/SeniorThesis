@@ -20,8 +20,10 @@ public class Partitioner {
     // sets everything up
     public static void Partition (int size, int numOfTrials) {
         int adjustedSize = size + 2;
+        int trialsConducted = 0;
         
-        for(int i = 0; i < numOfTrials; i++) {
+        while(trialsConducted < numOfTrials) {
+            Boolean isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
             // Squaretopia.show();
             Set<SquaretopiaState> freeSquares = generateSetOfFreeStates(Squaretopia);
@@ -44,7 +46,8 @@ public class Partitioner {
                 // System.out.println("currentDistrictFreeNeighbors.size(): " + currentDistrictFreeNeighbors.size()); // delete
                 // System.out.println("recentlyAddedTransitions.size(): " + recentlyAddedTransitions.size()); // delete
                 if (recursiveDistricter(Squaretopia, freeSquares, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions) == null) {
-                    System.out.println("NO SOLUTION!"); // delete;
+                    // System.out.println("NO SOLUTION!"); // delete;
+                    isValidPartition = false;
                     break;
                 }
                 // System.out.println("finished one district!"); // delete
@@ -61,10 +64,14 @@ public class Partitioner {
     //                currentDistrict.add(claimedState);
     //            }
             }
-            Squaretopia.show();
-            Schwartzberg(Squaretopia);
-            // lengthWidthScore(Squaretopia);
-            // Reock(Squaretopia);
+            if(isValidPartition) {
+                Squaretopia.show();
+                // System.out.println(Math.round(Schwartzberg(Squaretopia)*100) + " " + Math.round(PolsbyPopper(Squaretopia)*100) + " " + Math.round(Reock(Squaretopia)*100) + " " + Math.round(LengthWidthScore(Squaretopia)*100));
+                System.out.println(""); // delete
+                trialsConducted++;
+            } else {
+                isValidPartition = true;
+            }
         }
         
     }
@@ -88,7 +95,7 @@ public class Partitioner {
         for(int i = 0; i < numOfDistricts; i++) {
             perimetersArray[i] = 4 * numOfDistricts;
         }
-        System.out.println(""); // delete
+        // System.out.println(""); // delete
         for(int i = 1; i < matrix.data.length - 1; i++) {
             for(int j = 1; j < matrix.data.length - 1; j++) {
                 int districtNumOfCurrentState = matrix.data[i][j].districtNumber;
@@ -107,11 +114,11 @@ public class Partitioner {
             }
         }
         
-        System.out.println("PerimetersArray"); // delete
-        for(int i = 0; i < perimetersArray.length; i++) { // delete
-            System.out.print(perimetersArray[i] + " "); // delete
-        }
-        System.out.println(""); // delete
+//        System.out.println("PerimetersArray"); // delete
+//        for(int i = 0; i < perimetersArray.length; i++) { // delete
+//            System.out.print(perimetersArray[i] + " "); // delete
+//        }
+//        System.out.println(""); // delete
         return perimetersArray;
     }
     
@@ -300,7 +307,7 @@ public class Partitioner {
     }
     
     // calculates the sum of the length-width ratios for all districts in a given Squaretopia 
-    public static double lengthWidthScore(SquaretopiaMatrix matrix) {
+    public static double LengthWidthScore(SquaretopiaMatrix matrix) {
         // locate and save extrema states
         double scoreTotal = 0;
         double numOfDistricts = matrix.data.length - 2;
@@ -357,7 +364,7 @@ public class Partitioner {
             }
         }
         double averageScore = scoreTotal / numOfDistricts;
-        System.out.println(averageScore); // delete
+        // System.out.println(averageScore); // delete
         // System.out.println("\n\n\n"); // delete
         return averageScore;
     }
@@ -410,18 +417,18 @@ public class Partitioner {
             width = Math.abs(extrema[i][2].col - extrema[i][3].col) + 1;
             // System.out.println("width: " + width); // delete
             if (length < width) {
-                System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (width * width)); // delete
-                System.out.println("-----"); // delete
+                // System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (width * width)); // delete
+                // System.out.println("-----"); // delete
                 scoreTotal += numOfDistricts / (width * width);
             } else {
-                System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (length * length)); // delete
-                System.out.println("-----"); // delete
+                // System.out.println("district " + (i + 1) +  " score: " + numOfDistricts / (length * length)); // delete
+                // System.out.println("-----"); // delete
                 scoreTotal += numOfDistricts / (length * length);
             }
         }
         double averageScore = scoreTotal / numOfDistricts;
-        System.out.println(averageScore); // delete
-        System.out.println("\n\n\n"); // delete
+        // System.out.println(averageScore); // delete
+        //System.out.println("\n\n\n"); // delete
         return averageScore;
     }
     
@@ -435,8 +442,8 @@ public class Partitioner {
             scoreTotal += areaOfADistrict / Math.pow(Double.valueOf(perimetersArray[i]) / 4, 2);
         }
         double averageScore = scoreTotal / numOfDistricts;
-        System.out.println(averageScore); // delete
-        System.out.println("\n\n\n"); // delete
+        // System.out.println(averageScore); // delete
+        // System.out.println("\n\n\n"); // delete
         return averageScore;
     }
     
@@ -450,8 +457,8 @@ public class Partitioner {
             scoreTotal += (4 * Math.sqrt(Double.valueOf(areaOfADistrict))) / Double.valueOf(perimetersArray[i]);
         }
         double averageScore = scoreTotal / numOfDistricts;
-        System.out.println(averageScore); // delete
-        System.out.println("\n\n\n"); // delete
+        // System.out.println(averageScore); // delete
+        // System.out.println("\n\n\n"); // delete
         return averageScore;
     }
 }
