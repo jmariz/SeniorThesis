@@ -11,6 +11,8 @@ public class SquaretopiaState {
     public int col;
     public int districtNumber;
     public boolean checked;
+    public int direction; // relative to parent, this state is in this direction
+                          // where -1 is not yet defined, 1 is above, 2 is right, 3 is below, 4 is left
     
     /**
      * Constructs a new MazeState, which tracks the given row and column that it
@@ -24,6 +26,7 @@ public class SquaretopiaState {
         this.col = col;
         this.districtNumber = 0;
         this.checked = false; // has this state been accounted for
+        this.direction = -1;
         
     }
     
