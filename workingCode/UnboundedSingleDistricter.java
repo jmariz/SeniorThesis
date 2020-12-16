@@ -77,6 +77,7 @@ public class UnboundedSingleDistricter {
     public static SquaretopiaState randomState(Set<SquaretopiaState> set) {
         SquaretopiaState chosenState = new SquaretopiaState(-1, -1);
         int numOfStates = set.size();
+        System.out.println("num of neighbor states: " + numOfStates); // delete
         // System.out.println("number of choices for current state: " + numOfStates); // delete
         int chosenStateIndex = (int) Math.ceil((Math.random() * numOfStates));
         Iterator<SquaretopiaState> it = set.iterator();
@@ -129,7 +130,8 @@ public class UnboundedSingleDistricter {
             matrix.data[claimedState.row][claimedState.col].districtNumber = 0;
             matrix.data[claimedState.row][claimedState.col].checked = false;
         }
-        // matrix.show(); // delete
+        matrix.show(); // delete
+        System.out.println(""); // delete
         return matrix;
     }
     
