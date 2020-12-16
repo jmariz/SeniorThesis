@@ -65,9 +65,9 @@ public class WeightedPartitioner {
     //            }
             }
             if(isValidPartition) {
-                Squaretopia.show();
-                // System.out.println(Math.round(Schwartzberg(Squaretopia)*100) + " " + Math.round(PolsbyPopper(Squaretopia)*100) + " " + Math.round(Reock(Squaretopia)*100) + " " + Math.round(LengthWidthScore(Squaretopia)*100));
-                System.out.println(""); // delete
+                //Squaretopia.show();
+                System.out.println(Math.round(Schwartzberg(Squaretopia)*100) + " " + Math.round(PolsbyPopper(Squaretopia)*100) + " " + Math.round(Reock(Squaretopia)*100) + " " + Math.round(LengthWidthScore(Squaretopia)*100));
+                // System.out.println(""); // delete
                 trialsConducted++;
             } else {
                 isValidPartition = true;
@@ -180,16 +180,16 @@ public class WeightedPartitioner {
         if(state != null) {
             if(state.direction == 1) {
                 sequentialState = new SquaretopiaState(state.row - 1, state.col);
-                sequentialState.direction = 1;
+                // sequentialState.direction = 1;
             } else if (state.direction == 2) {
                 sequentialState = new SquaretopiaState(state.row, state.col + 1);
                 sequentialState.direction = 2;
             } else if (state.direction == 3) {
                 sequentialState = new SquaretopiaState(state.row + 1, state.col);
-                sequentialState.direction = 3;
+                // sequentialState.direction = 3;
             } else if (state.direction == 4) {
                 sequentialState = new SquaretopiaState(state.row, state.col - 1);
-                sequentialState.direction = 4;
+                // sequentialState.direction = 4;
             }
         }
         return sequentialState;
@@ -207,26 +207,30 @@ public class WeightedPartitioner {
     public static Set<SquaretopiaState> getTransitions (SquaretopiaMatrix matrix, SquaretopiaState currentLocation) {
         int curLocRow = currentLocation.row;
         int curLocCol = currentLocation.col;
-        int parentDirection = currentLocation.direction;
+        // int parentDirection = currentLocation.direction;
         Set<SquaretopiaState> possibleTransitions = new HashSet<>();
         if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the state above
             SquaretopiaState possibleTransitionAbove = new SquaretopiaState(curLocRow - 1, curLocCol);
-            possibleTransitionAbove.direction = parentDirection == -1 ? 1 : parentDirection;
+            // possibleTransitionAbove.direction = parentDirection == -1 ? 1 : parentDirection;
+            possibleTransitionAbove.direction = 1;
             possibleTransitions.add(possibleTransitionAbove);
         }
         if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the state below
             SquaretopiaState possibleTransitionBelow = new SquaretopiaState(curLocRow + 1, curLocCol);
-            possibleTransitionBelow.direction = parentDirection == -1 ? 3 : parentDirection;
+            // possibleTransitionBelow.direction = parentDirection == -1 ? 3 : parentDirection;
+            possibleTransitionBelow.direction = 3;
             possibleTransitions.add(possibleTransitionBelow);
         }
         if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the state to the left
             SquaretopiaState possibleTransitionLeft = new SquaretopiaState(curLocRow, curLocCol - 1);
-            possibleTransitionLeft.direction = parentDirection == -1 ? 4 : parentDirection;
+            // possibleTransitionLeft.direction = parentDirection == -1 ? 4 : parentDirection;
+            possibleTransitionLeft.direction = 4;
             possibleTransitions.add(possibleTransitionLeft);
         }
         if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the state to the right
             SquaretopiaState possibleTransitionRight = new SquaretopiaState(curLocRow, curLocCol + 1);
-            possibleTransitionRight.direction = parentDirection == -1 ? 2 : parentDirection;
+            // possibleTransitionRight.direction = parentDirection == -1 ? 2 : parentDirection;
+            possibleTransitionRight.direction = 2;
             possibleTransitions.add(possibleTransitionRight);
         }
         return possibleTransitions;
