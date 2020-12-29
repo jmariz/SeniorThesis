@@ -21,9 +21,9 @@ public class WeightedUnboundedSingleDistricter {
     public static void Partition (int size, int numOfTrials, double threshold) {
         int adjustedSize = ((size - 1) * 2 + 1) + 2; // add 2 for compatibility with outer perimeter of zeroes
         int trialsConducted = 0;
-        
+        Boolean isValidPartition;
         while(trialsConducted < numOfTrials) {
-            Boolean isValidPartition = true;
+            isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
             // Squaretopia.show();
             
@@ -75,35 +75,47 @@ public class WeightedUnboundedSingleDistricter {
     
     // pick a random state from the set of free states
     // this method includes weighting
-    // threshold is the minimum probability of selecting the sequential state (the state that follows if we continue in the same direction)
-    public static SquaretopiaState randomState(Set<SquaretopiaState> set, SquaretopiaState recentlyClaimedState, double threshold) {
+    // p is the minimum p of selecting the sequential state (the state that follows if we continue in the same direction)
+    public static SquaretopiaState randomState(Set<SquaretopiaState> set, SquaretopiaState recentlyClaimedState, double p) {
+        p = p / 100;
         SquaretopiaState chosenState = new SquaretopiaState(-1, -1);
-        SquaretopiaState targetState = nextSequentialState(recentlyClaimedState); // state that will be assigned the highest probability
+        SquaretopiaState targetState = nextSequentialState(recentlyClaimedState); // state that will be assigned the highest p
         int indexOfTargetStateInSet = findIndex(set, targetState);
-        int chosenStateIndex;
-        Iterator<SquaretopiaState> it = set.iterator();
-        chosenState = it.next();
-        if(indexOfTargetStateInSet == -1) { // each state in set has equal probability
+        if(indexOfTargetStateInSet == -1) { // each state in set has equal p
             int numOfStates = set.size();
-            // System.out.println("number of choices for current state: " + numOfStates); // delete
-            chosenStateIndex = (int) Math.floor((Math.random() * numOfStates));
-            // System.out.println("chosenStateIndex: " + chosenStateIndex); // delete
-        } else { // weigh target state with a greater probability
-            int numOfOtherStates = set.size() - 1;
-            int numOfAdditionalCopies = (int) Math.ceil(Double.valueOf(numOfOtherStates) / (1 - threshold / 100));
-            int[] arrayOfIndexes = new int[1 + numOfOtherStates + numOfAdditionalCopies];
-            for(int i = 0; i < numOfOtherStates + 1; i++) {
-                arrayOfIndexes[i] = i;
+            int chosenStateIndex = (int) Math.ceil((Math.random() * numOfStates));
+            Iterator<SquaretopiaState> it = set.iterator();
+            for (int i = 0; i < chosenStateIndex; i++) {
+                chosenState = it.next();
             }
-            for(int i = 0; i < numOfAdditionalCopies; i++) {
-                arrayOfIndexes[numOfOtherStates + 1 + i] = indexOfTargetStateInSet;
+            return chosenState;
+        } else { // weigh target state with a greater p
+            double numOfStates = set.size();
+            double remainingProbability = 1 - p;
+            double nonTargetStateProbability;
+            if(set.size() == 1) {
+                nonTargetStateProbability = 0;
+            } else {
+                nonTargetStateProbability = remainingProbability / (numOfStates - 1);
             }
-            chosenStateIndex = arrayOfIndexes[(int) Math.floor((Math.random() * arrayOfIndexes.length))];
+            double previousUpperBound = 0;
+            for(SquaretopiaState state : set) {
+                state.lowerBoundForProbability = previousUpperBound;
+                if(state.equals(targetState)) {
+                    state.upperBoundForProbability = previousUpperBound + p;
+                } else {
+                    state.upperBoundForProbability = previousUpperBound + nonTargetStateProbability;
+                }
+                previousUpperBound = state.upperBoundForProbability;
+            }
+            double randomNumber = Math.random();
+            for(SquaretopiaState state : set) {
+                if((state.lowerBoundForProbability <= randomNumber) && (randomNumber < state.upperBoundForProbability)) {
+                    return state;
+                }
+            }
+            return null; // something went wrong
         }
-        for (int i = 0; i < chosenStateIndex; i++) {
-            chosenState = it.next();
-        }
-        return chosenState;
     }
     
     // determines the index of a given state in some given set
