@@ -71,14 +71,14 @@ public class PartitionTests {
 //        );
         
         
-        // Partitioner.Partition(5, 2);
-        // SingleDistricter.Partition(5, 1);
-        // UnboundedSingleDistricter.Partition(5, 1);
+        // Partitioner.Partition(5, 10);
+        // SingleDistricter.Partition(5, 10);
+        // UnboundedSingleDistricter.Partition(5, 3);
         
-        //WeightedPartitioner.Partition(7, 10, 10);
-        
-        WeightedSingleDistricter.Partition(5, 10000, 99);
-        //WeightedUnboundedSingleDistricter.Partition(5, 10000, 99);
+        // WeightedPartitioner.Partition(7, 10000, 99);
+       
+        // WeightedSingleDistricter.Partition(5, 10000,100);
+        // WeightedUnboundedSingleDistricter.Partition(5, 6, 100);
         
         // DraftWeightedPartitioner.Partition(5, 10, 99.99);
         
