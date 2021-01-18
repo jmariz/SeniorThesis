@@ -155,26 +155,6 @@ public class Partitioner {
         return possibleTransitions;
     }
     
-    // get a specified state's number of free neighbors
-    public int getTransitionsScore (SquaretopiaMatrix matrix, SquaretopiaState currentLocation) {
-        int transitionsScore = 0;
-        int curLocRow = currentLocation.row;
-        int curLocCol = currentLocation.col;
-        if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the state above
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the state below
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the state to the left
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the state to the right
-            transitionsScore++;
-        }
-        return transitionsScore;
-    }
-    
     // update the matrix
     public static SquaretopiaMatrix updateMatrix(SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, SquaretopiaState claimedState) {
         // System.out.println("claimedState.row: " + claimedState.row); // delete
