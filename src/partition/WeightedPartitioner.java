@@ -23,7 +23,7 @@ public class WeightedPartitioner {
         while(trialsConducted < numOfTrials) {
             isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
-            Set<SquaretopiaState> freeSquares = generateSetOfFreeStates(Squaretopia);
+            Set<SquaretopiaState> freeSquares = Squaretopia.generateSetOfFreeStates();
             Set<SquaretopiaState> currentDistrict = new HashSet<>();
             Set<SquaretopiaState> currentDistrictFreeNeighbors = new HashSet<>();
             Set<SquaretopiaState> recentlyAddedTransitions = new HashSet<>();
@@ -113,18 +113,6 @@ public class WeightedPartitioner {
           return null;
     }
     
-    // generate a set of all the free states
-    public static Set<SquaretopiaState> generateSetOfFreeStates(SquaretopiaMatrix matrix) {
-        int matrixLength = matrix.data.length; // assumes square matrix!
-        Set<SquaretopiaState> setOfStates = new HashSet<>();
-        for(int i = 1; i < matrixLength - 1; i++) { // don't want states around the perimeter 
-            for(int j = 1; j < matrixLength - 1; j++) {
-                setOfStates.add(new SquaretopiaState(i, j));
-            }
-        }
-        return setOfStates;
-    }
-    
     // pick a random state from the set of free states
     // this method includes weighting
     // p is the minimum p of selecting the sequential state (the state that follows if we continue in the same direction)
@@ -146,26 +134,33 @@ public class WeightedPartitioner {
             double remainingProbability = 1 - p;
             double nonTargetStateProbability;
             if(set.size() == 1) {
-                nonTargetStateProbability = 0;
+                Iterator<SquaretopiaState> it = set.iterator();
+                return it.next();
             } else {
                 nonTargetStateProbability = remainingProbability / (numOfStates - 1);
-            }
-            double previousUpperBound = 0;
-            for(SquaretopiaState state : set) {
-                state.lowerBoundForProbability = previousUpperBound;
-                if(state.equals(targetState)) {
-                    state.upperBoundForProbability = previousUpperBound + p;
-                } else {
-                    state.upperBoundForProbability = previousUpperBound + nonTargetStateProbability;
+                double previousUpperBound = 0;
+                for(SquaretopiaState state : set) {
+                    state.lowerBoundForProbability = previousUpperBound;
+                    if(state.equals(targetState)) {
+                        state.upperBoundForProbability = previousUpperBound + p;
+                    } else {
+                        state.upperBoundForProbability = previousUpperBound + nonTargetStateProbability;
+                    }
+                    previousUpperBound = state.upperBoundForProbability;
                 }
-                previousUpperBound = state.upperBoundForProbability;
-            }
-            double randomNumber = Math.random();
-            for(SquaretopiaState state : set) {
-                if((state.lowerBoundForProbability <= randomNumber) && (randomNumber < state.upperBoundForProbability)) {
-                    return state;
+                double randomNumber = Math.random();
+                for(SquaretopiaState state : set) {
+                    if((state.lowerBoundForProbability <= randomNumber) && (randomNumber < state.upperBoundForProbability)) {
+                        return state;
+                    }
                 }
+                for(SquaretopiaState state : set) { // delete
+                    System.out.println("state.lowerBoundForProbability: " + state.lowerBoundForProbability); // delete
+                    System.out.println("state.upperBoundForProbability: " + state.upperBoundForProbability); // delete
+                }
+                System.out.println("randomNumber: " + randomNumber); // delete
             }
+            System.out.println("Something went wrong"); // delete
             return null; // something went wrong
         }
     }
@@ -198,7 +193,7 @@ public class WeightedPartitioner {
                 // sequentialState.direction = 1;
             } else if (state.direction == 2) {
                 sequentialState = new SquaretopiaState(state.row, state.col + 1);
-                sequentialState.direction = 2;
+                // sequentialState.direction = 2;
             } else if (state.direction == 3) {
                 sequentialState = new SquaretopiaState(state.row + 1, state.col);
                 // sequentialState.direction = 3;
@@ -249,26 +244,6 @@ public class WeightedPartitioner {
             possibleTransitions.add(possibleTransitionRight);
         }
         return possibleTransitions;
-    }
-    
-    // get a specified state's number of free neighbors
-    public int getTransitionsScore (SquaretopiaMatrix matrix, SquaretopiaState currentLocation) {
-        int transitionsScore = 0;
-        int curLocRow = currentLocation.row;
-        int curLocCol = currentLocation.col;
-        if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the state above
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the state below
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the state to the left
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the state to the right
-            transitionsScore++;
-        }
-        return transitionsScore;
     }
     
     // update the matrix
