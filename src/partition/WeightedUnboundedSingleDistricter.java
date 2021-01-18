@@ -1,12 +1,8 @@
 package partition;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-
-import com.sun.jdi.DoubleValue;
 
 /**
  * Partition
@@ -21,13 +17,11 @@ public class WeightedUnboundedSingleDistricter {
     public static void Partition (int size, int numOfTrials, double threshold) {
         int adjustedSize = ((size - 1) * 2 + 1) + 2; // add 2 for compatibility with outer perimeter of zeroes
         int trialsConducted = 0;
-        Boolean isValidPartition;
         while(trialsConducted < numOfTrials) {
-            isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
             // Squaretopia.show();
             
-            Set<SquaretopiaState> freeSquares = generateSetOfFreeStates(Squaretopia);
+            Set<SquaretopiaState> freeSquares = Squaretopia.generateSetOfFreeStates();
             SquaretopiaState claimedState = Squaretopia.data[size][size]; // claim center state
             Set<SquaretopiaState> currentDistrict = new HashSet<>();
             Set<SquaretopiaState> currentDistrictFreeNeighbors = new HashSet<>();
@@ -51,7 +45,6 @@ public class WeightedUnboundedSingleDistricter {
             }
 //            if(isValidPartition) {
                 Squaretopia.show();
-//                // System.out.println(Math.round(Schwartzberg(Squaretopia)*100) + " " + Math.round(PolsbyPopper(Squaretopia)*100) + " " + Math.round(Reock(Squaretopia)*100) + " " + Math.round(LengthWidthScore(Squaretopia)*100));
                 System.out.println(""); // delete
                 trialsConducted++;
 //            } else {
@@ -61,16 +54,39 @@ public class WeightedUnboundedSingleDistricter {
         
     }
     
-    // generate a set of all the free states
-    public static Set<SquaretopiaState> generateSetOfFreeStates(SquaretopiaMatrix matrix) {
-        int matrixLength = matrix.data.length; // assumes square matrix!
-        Set<SquaretopiaState> setOfStates = new HashSet<>();
-        for(int i = 1; i < matrixLength - 1; i++) { // don't want states around the perimeter 
-            for(int j = 1; j < matrixLength - 1; j++) {
-                setOfStates.add(new SquaretopiaState(i, j));
-            }
-        }
-        return setOfStates;
+    // recursion algorithm
+    public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, Set<SquaretopiaState> currentDistrict, Set<SquaretopiaState> allPossibleTransitions, Set<SquaretopiaState> recentlyAddedTransitions, SquaretopiaState recentlyAddedState, double threshold) {
+          if(currentDistrict.size() == (int) (((matrix.data.length - 2) - 1) / 2 + 1)) { // assumes matrix is a square
+              // System.out.println("valid map? " + matrix.validMap(matrix)); // delete
+              return matrix;
+          }
+          
+          Set<SquaretopiaState> newAllPossibleNeighbors = new HashSet<>();
+          newAllPossibleNeighbors.addAll(allPossibleTransitions);
+          Set<SquaretopiaState> newRecentlyAddedTransitions = new HashSet<>();
+          
+          while(newAllPossibleNeighbors.size() != 0) {
+              SquaretopiaState nextState = isolatedState(matrix, newAllPossibleNeighbors);
+              if(nextState == null) {
+                  nextState = randomState(newAllPossibleNeighbors, recentlyAddedState, threshold);
+              }
+              // System.out.println("nextState... " + nextState.toString()); // delete
+              claimer(matrix, freeStates, currentDistrict, nextState);
+              newAllPossibleNeighbors.remove(nextState);
+              newRecentlyAddedTransitions = recentlyAddedTransitions(newAllPossibleNeighbors, getTransitions(matrix, nextState));
+              // System.out.println("recentlyAddedTransitions.size(): " + newRecentlyAddedTransitions.size()); // delete
+              newAllPossibleNeighbors.addAll(getTransitions(matrix, nextState));
+              if(recursiveDistricter(matrix, freeStates, currentDistrict, newAllPossibleNeighbors, newRecentlyAddedTransitions, nextState, threshold) == null) {
+                  newAllPossibleNeighbors.remove(nextState);
+                  returner(matrix, freeStates, currentDistrict, nextState);
+                  newAllPossibleNeighbors.removeAll(newRecentlyAddedTransitions);
+              } else {
+                  return matrix;
+              }
+              // System.out.println("reached end of while loop in recurser"); // delete
+          }
+          // System.out.println("returning null from the end of the recurser..."); // delete
+          return null;
     }
     
     // pick a random state from the set of free states
@@ -215,41 +231,6 @@ public class WeightedUnboundedSingleDistricter {
         // matrix.show(); // delete
         // System.out.println(""); // delete
         return matrix;
-    }
-    
-    // recursion algorithm
-    public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, Set<SquaretopiaState> currentDistrict, Set<SquaretopiaState> allPossibleTransitions, Set<SquaretopiaState> recentlyAddedTransitions, SquaretopiaState recentlyAddedState, double threshold) {
-          if(currentDistrict.size() == (int) (((matrix.data.length - 2) - 1) / 2 + 1)) { // assumes matrix is a square
-              // System.out.println("valid map? " + matrix.validMap(matrix)); // delete
-              return matrix;
-          }
-          
-          Set<SquaretopiaState> newAllPossibleNeighbors = new HashSet<>();
-          newAllPossibleNeighbors.addAll(allPossibleTransitions);
-          Set<SquaretopiaState> newRecentlyAddedTransitions = new HashSet<>();
-          
-          while(newAllPossibleNeighbors.size() != 0) {
-              SquaretopiaState nextState = isolatedState(matrix, newAllPossibleNeighbors);
-              if(nextState == null) {
-                  nextState = randomState(newAllPossibleNeighbors, recentlyAddedState, threshold);
-              }
-              // System.out.println("nextState... " + nextState.toString()); // delete
-              claimer(matrix, freeStates, currentDistrict, nextState);
-              newAllPossibleNeighbors.remove(nextState);
-              newRecentlyAddedTransitions = recentlyAddedTransitions(newAllPossibleNeighbors, getTransitions(matrix, nextState));
-              // System.out.println("recentlyAddedTransitions.size(): " + newRecentlyAddedTransitions.size()); // delete
-              newAllPossibleNeighbors.addAll(getTransitions(matrix, nextState));
-              if(recursiveDistricter(matrix, freeStates, currentDistrict, newAllPossibleNeighbors, newRecentlyAddedTransitions, nextState, threshold) == null) {
-                  newAllPossibleNeighbors.remove(nextState);
-                  returner(matrix, freeStates, currentDistrict, nextState);
-                  newAllPossibleNeighbors.removeAll(newRecentlyAddedTransitions);
-              } else {
-                  return matrix;
-              }
-              // System.out.println("reached end of while loop in recurser"); // delete
-          }
-          // System.out.println("returning null from the end of the recurser..."); // delete
-          return null;
     }
     
     // returns a squaretopiaState with one neighbor if it exists 
