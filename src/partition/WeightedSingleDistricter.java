@@ -126,26 +126,33 @@ public class WeightedSingleDistricter {
             double remainingProbability = 1 - p;
             double nonTargetStateProbability;
             if(set.size() == 1) {
-                nonTargetStateProbability = 0;
+                Iterator<SquaretopiaState> it = set.iterator();
+                return it.next();
             } else {
                 nonTargetStateProbability = remainingProbability / (numOfStates - 1);
-            }
-            double previousUpperBound = 0;
-            for(SquaretopiaState state : set) {
-                state.lowerBoundForProbability = previousUpperBound;
-                if(state.equals(targetState)) {
-                    state.upperBoundForProbability = previousUpperBound + p;
-                } else {
-                    state.upperBoundForProbability = previousUpperBound + nonTargetStateProbability;
+                double previousUpperBound = 0;
+                for(SquaretopiaState state : set) {
+                    state.lowerBoundForProbability = previousUpperBound;
+                    if(state.equals(targetState)) {
+                        state.upperBoundForProbability = previousUpperBound + p;
+                    } else {
+                        state.upperBoundForProbability = previousUpperBound + nonTargetStateProbability;
+                    }
+                    previousUpperBound = state.upperBoundForProbability;
                 }
-                previousUpperBound = state.upperBoundForProbability;
-            }
-            double randomNumber = Math.random();
-            for(SquaretopiaState state : set) {
-                if((state.lowerBoundForProbability <= randomNumber) && (randomNumber < state.upperBoundForProbability)) {
-                    return state;
+                double randomNumber = Math.random();
+                for(SquaretopiaState state : set) {
+                    if((state.lowerBoundForProbability <= randomNumber) && (randomNumber < state.upperBoundForProbability)) {
+                        return state;
+                    }
                 }
+                for(SquaretopiaState state : set) { // delete
+                    System.out.println("state.lowerBoundForProbability: " + state.lowerBoundForProbability); // delete
+                    System.out.println("state.upperBoundForProbability: " + state.upperBoundForProbability); // delete
+                }
+                System.out.println("randomNumber: " + randomNumber); // delete
             }
+            System.out.println("Something went wrong"); // delete
             return null; // something went wrong
         }
     }
@@ -178,7 +185,7 @@ public class WeightedSingleDistricter {
                 // sequentialState.direction = 1;
             } else if (state.direction == 2) {
                 sequentialState = new SquaretopiaState(state.row, state.col + 1);
-                sequentialState.direction = 2;
+                // sequentialState.direction = 2;
             } else if (state.direction == 3) {
                 sequentialState = new SquaretopiaState(state.row + 1, state.col);
                 // sequentialState.direction = 3;
@@ -229,26 +236,6 @@ public class WeightedSingleDistricter {
             possibleTransitions.add(possibleTransitionRight);
         }
         return possibleTransitions;
-    }
-    
-    // get a specified state's number of free neighbors
-    public int getTransitionsScore (SquaretopiaMatrix matrix, SquaretopiaState currentLocation) {
-        int transitionsScore = 0;
-        int curLocRow = currentLocation.row;
-        int curLocCol = currentLocation.col;
-        if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the state above
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the state below
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the state to the left
-            transitionsScore++;
-        }
-        if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the state to the right
-            transitionsScore++;
-        }
-        return transitionsScore;
     }
     
     // update the matrix
