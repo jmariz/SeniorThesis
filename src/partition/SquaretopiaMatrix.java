@@ -15,7 +15,7 @@ final public class SquaretopiaMatrix {
     
     /**
      * Sets up an M by N representation of Squaretopia using an array of SquaretopiaCell arrays.
-     * <b>NOTE: This method initializes the outer padding layer of the Squaretopia matrix to -1. This is so that each inner cell has four adjacent neighbors.</b>
+     * NOTE: This method initializes the outer padding layer of the Squaretopia matrix to -1. This is so that each inner cell has four adjacent neighbors.
      * @param M Integer number of rows in this Squaretopia
      * @param N Integer number of columns in this Squaretopia
      * @return void
@@ -37,7 +37,7 @@ final public class SquaretopiaMatrix {
     
     /**
      * Prints a String representation of this Squaretopia. Prints a matrix where each number corresponds to the district number of that Squaretopia cell. 
-     * <b>NOTE: This method does not print the outer padding layer of -1s.</b>
+     * NOTE: This method does not print the outer padding layer of -1s.
      * @return void
      */
     public void show() {
@@ -58,7 +58,7 @@ final public class SquaretopiaMatrix {
     
     /**
      * Creates a set containing all the inner Squaretopia cells.
-     * <b>NOTE: This method assumes that all inner cells are unclaimed, so it should only be called after the initialization of this Squaretopia.</b>
+     * NOTE: This method assumes that all inner cells are unclaimed, so it should only be called after the initialization of this Squaretopia.
      * @return Set<SquaretopiaCell> containing all the inner cells of this Squaretopia matrix
      */
     public Set<SquaretopiaCell> generateSetOfFreeCells() {
@@ -89,7 +89,7 @@ final public class SquaretopiaMatrix {
     /**
      * Determines if this Squaretopia matrix is valid. An invalid matrix contains at least one isolated group of k Squaretopia cells, 
      * where n, the number of cells in each district, doesn't divide k.
-     * <b>NOTE: This method assumes that this Squaretopia matrix is a square.</b>
+     * NOTE: This method assumes that this Squaretopia matrix is a square.
      * @param matrix SquaretopiaMatrix whose validity we will check
      * @return Boolean value for the statement: This matrix is valid.
      */ 
@@ -112,7 +112,7 @@ final public class SquaretopiaMatrix {
     
     /**
      * Creates a SquaretopiaMatrix duplicate of this Squaretopia matrix.
-     * <b>NOTE: This method assumes that this Squaretopia matrix is a square.</b>
+     * NOTE: This method assumes that this Squaretopia matrix is a square.
      * @param matrix SquaretopiaMatrix that we will duplicate
      * @return void
      */
@@ -368,5 +368,5 @@ final public class SquaretopiaMatrix {
         double averageScore = scoreTotal / numOfDistricts;
         return averageScore;
     }
-
+    
 }
