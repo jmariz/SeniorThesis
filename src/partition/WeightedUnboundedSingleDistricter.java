@@ -13,8 +13,8 @@ public class WeightedUnboundedSingleDistricter {
     
     /**
      * Prepares the Squaretopia weighted unbounded single-districting process.
-     * <b>NOTE: This method forces the central cell of the adjusted matrix to be the first cell in the district. This allows us to generate unbounded districts.</b>
-     * <b>NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.</b>
+     * NOTE: This method forces the central cell of the adjusted matrix to be the first cell in the district. This allows us to generate unbounded districts.
+     * NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.
      * @param size Integer number of the Squaretopia's size
      * @param numOfTrials Integer number for the number of single districts we will generate
      * @param probability Double value for our weighting factor probability
