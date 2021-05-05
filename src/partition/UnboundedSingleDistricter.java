@@ -13,7 +13,7 @@ public class UnboundedSingleDistricter {
     
     /**
      * Prepares the Squaretopia unbounded single-districting process.
-     * <b>NOTE: This method forces the central cell of the adjusted matrix to be the first cell in the district. This allows us to generate unbounded districts.</b>
+     * NOTE: This method forces the central cell of the adjusted matrix to be the first cell in the district. This allows us to generate unbounded districts.
      * @param size Integer number of the Squaretopia's size
      * @param numOfTrials Integer number for the number of single districts we will generate
      * @return void
