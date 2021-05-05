@@ -5,55 +5,48 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Partition
+ * Joshua Mariz 05/05/2021
+ * SingleDistricter.java
+ * SingleDistricter uniformly at random generates a district of size n in an n by n Squaretopia
  */
 public class SingleDistricter {
     
     /**
-     * Public interface for Partition
+     * Prepares the Squaretopia single-districting process.
+     * @param size Integer number of the Squaretopia's size
+     * @param numOfTrials Integer number for the number of single districts we will generate
+     * @return void
      */
-    
-    // sets everything up
     public static void Partition (int size, int numOfTrials) {
         int adjustedSize = size + 2;
         int trialsConducted = 0;
-        
         while(trialsConducted < numOfTrials) {
             Boolean isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
-            // Squaretopia.show();
-            Set<SquaretopiaState> freeSquares = Squaretopia.generateSetOfFreeStates();
-            // System.out.println("freeSquares.size(): " + freeSquares.size()); // delete
-            Set<SquaretopiaState> currentDistrict = new HashSet<>();
-            Set<SquaretopiaState> currentDistrictFreeNeighbors = new HashSet<>();
-            Set<SquaretopiaState> recentlyAddedTransitions = new HashSet<>();
-            SquaretopiaState claimedState;
-    //        currentDistrict.add(claimedState);
-            while(freeSquares.size() > (size * size - size)) { // only need to generate 1 district
-                claimedState = deadEnd(Squaretopia, freeSquares);
-                if(claimedState == null) {
-                    claimedState = randomState(freeSquares);
+            Set<SquaretopiaCell> freeCells = Squaretopia.generateSetOfFreeCells();
+            Set<SquaretopiaCell> currentDistrict = new HashSet<>();
+            Set<SquaretopiaCell> currentDistrictFreeNeighbors = new HashSet<>();
+            Set<SquaretopiaCell> recentlyAddedTransitions = new HashSet<>();
+            SquaretopiaCell claimedCell;
+            while(freeCells.size() > (size * size - size)) { // we only need to generate one district
+                claimedCell = deadEnd(Squaretopia, freeCells);
+                if(claimedCell == null) {
+                    claimedCell = randomCell(freeCells);
                 }
-                // claimedState = randomState(freeSquares);
-                claimer(Squaretopia, freeSquares, currentDistrict, claimedState);
+                claimer(Squaretopia, freeCells, currentDistrict, claimedCell);
                 
-                currentDistrictFreeNeighbors.addAll(getTransitions(Squaretopia, claimedState));
-                recentlyAddedTransitions.addAll(getTransitions(Squaretopia, claimedState));
-                // System.out.println("currentDistrictFreeNeighbors.size(): " + currentDistrictFreeNeighbors.size()); // delete
-                // System.out.println("recentlyAddedTransitions.size(): " + recentlyAddedTransitions.size()); // delete
-                if (recursiveDistricter(Squaretopia, freeSquares, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions) == null) {
-                    // System.out.println("NO SOLUTION!"); // delete;
+                currentDistrictFreeNeighbors.addAll(getTransitions(Squaretopia, claimedCell));
+                recentlyAddedTransitions.addAll(getTransitions(Squaretopia, claimedCell));
+                if (recursiveDistricter(Squaretopia, freeCells, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions) == null) {
                     isValidPartition = false;
                     break;
                 }
-                // System.out.println("finished one district!"); // delete
-                // Squaretopia.checkers(); // delete
                 currentDistrict.clear();
                 currentDistrictFreeNeighbors.clear();
             }
             if(isValidPartition) {
                 Squaretopia.show();
-                System.out.println(""); // delete
+                System.out.println("");
                 trialsConducted++;
             } else {
                 isValidPartition = true;
@@ -62,149 +55,128 @@ public class SingleDistricter {
         
     }
     
-    // recursion algorithm
-    public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, Set<SquaretopiaState> currentDistrict, Set<SquaretopiaState> allPossibleTransitions, Set<SquaretopiaState> recentlyAddedTransitions) {
-          if(currentDistrict.size() == (matrix.data.length - 2)) { // assumes matrix is a square
-              // System.out.println("valid map? " + matrix.validMap(matrix)); // delete
+    // recursive algorithm
+    public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells, Set<SquaretopiaCell> currentDistrict, Set<SquaretopiaCell> allPossibleTransitions, Set<SquaretopiaCell> recentlyAddedTransitions) {
+          if(currentDistrict.size() == (matrix.data.length - 2)) { // assumes matrix is a square!
               return matrix;
           }
           
-          Set<SquaretopiaState> newAllPossibleNeighbors = new HashSet<>();
+          Set<SquaretopiaCell> newAllPossibleNeighbors = new HashSet<>();
           newAllPossibleNeighbors.addAll(allPossibleTransitions);
-          Set<SquaretopiaState> newRecentlyAddedTransitions = new HashSet<>();
+          Set<SquaretopiaCell> newRecentlyAddedTransitions = new HashSet<>();
           
           while(newAllPossibleNeighbors.size() != 0) {
-              SquaretopiaState nextState = isolatedState(matrix, newAllPossibleNeighbors);
-              if(nextState == null) {
-                  nextState = randomState(newAllPossibleNeighbors);
+              SquaretopiaCell nextCell = isolatedCell(matrix, newAllPossibleNeighbors);
+              if(nextCell == null) {
+                  nextCell = randomCell(newAllPossibleNeighbors);
               }
-              // System.out.println("nextState... " + nextState.toString()); // delete
-              claimer(matrix, freeStates, currentDistrict, nextState);
-              newAllPossibleNeighbors.remove(nextState);
-              newRecentlyAddedTransitions = recentlyAddedTransitions(newAllPossibleNeighbors, getTransitions(matrix, nextState));
-              // System.out.println("recentlyAddedTransitions.size(): " + newRecentlyAddedTransitions.size()); // delete
-              newAllPossibleNeighbors.addAll(getTransitions(matrix, nextState));
-              // System.out.println("newAllPossibleNeighbors.size(): " + newAllPossibleNeighbors.size()); // delete
-              // for(SquaretopiaState state : newAllPossibleNeighbors) { // delete
-                  // System.out.println(state.toString()); // delete
-              // }
-              // System.out.println(""); // delete
-              // System.out.println(""); // delete
-              // System.out.println(""); // delete
-              if(recursiveDistricter(matrix, freeStates, currentDistrict, newAllPossibleNeighbors, newRecentlyAddedTransitions) == null) {
-                  // System.out.println("came back to line 200"); // delete
-                  newAllPossibleNeighbors.remove(nextState);
-                  returner(matrix, freeStates, currentDistrict, nextState);
+              claimer(matrix, freeCells, currentDistrict, nextCell);
+              newAllPossibleNeighbors.remove(nextCell);
+              newRecentlyAddedTransitions = recentlyAddedTransitions(newAllPossibleNeighbors, getTransitions(matrix, nextCell));
+              newAllPossibleNeighbors.addAll(getTransitions(matrix, nextCell));
+              if(recursiveDistricter(matrix, freeCells, currentDistrict, newAllPossibleNeighbors, newRecentlyAddedTransitions) == null) {
+                  newAllPossibleNeighbors.remove(nextCell);
+                  returner(matrix, freeCells, currentDistrict, nextCell);
                   newAllPossibleNeighbors.removeAll(newRecentlyAddedTransitions);
               } else {
                   return matrix;
               }
-              // System.out.println("reached end of while loop in recurser"); // delete
           }
-          // System.out.println("returning null from the end of the recurser..."); // delete
           return null;
     }
     
-    // pick a random state from the set of free states
-    public static SquaretopiaState randomState(Set<SquaretopiaState> set) {
-        SquaretopiaState chosenState = new SquaretopiaState(-1, -1);
-        int numOfStates = set.size();
-        // System.out.println("number of choices for current state: " + numOfStates); // delete
-        int chosenStateIndex = (int) Math.ceil((Math.random() * numOfStates));
-        Iterator<SquaretopiaState> it = set.iterator();
-        // System.out.println("chosenStateIndex: " + chosenStateIndex); // delete
-        for (int i = 0; i < chosenStateIndex; i++) {
-            chosenState = it.next();
+    // chooses a cell uniformly at random from the set of free cells
+    public static SquaretopiaCell randomCell(Set<SquaretopiaCell> set) {
+        SquaretopiaCell chosenCell = new SquaretopiaCell(-1, -1);
+        int numOfCells = set.size();
+        int chosenCellIndex = (int) Math.ceil((Math.random() * numOfCells));
+        Iterator<SquaretopiaCell> it = set.iterator();
+        for (int i = 0; i < chosenCellIndex; i++) {
+            chosenCell = it.next();
         }
-        // System.out.println("chose this state: " + chosenState.toString()); // delete
-        return chosenState;
+        return chosenCell;
     }
     
-    // determine which district we are constructing
-    public static int getCurrentDistrictNumber(SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates) {
-        // System.out.println("freeStates.size(): " + freeStates.size()); // delete
+    // determines which district we are constructing
+    public static int getCurrentDistrictNumber(SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells) {
         int n = matrix.data.length - 2; // assumes matrix is a square and subtract 2 because of outer layer
-        int currentDistrictNumber = (int) Math.ceil( Double.valueOf(n * n - freeStates.size()) / n );
+        int currentDistrictNumber = (int) Math.ceil( Double.valueOf(n * n - freeCells.size()) / n );
         return currentDistrictNumber;
     }
     
-    // get a specified state's free neighbors
-    public static Set<SquaretopiaState> getTransitions (SquaretopiaMatrix matrix, SquaretopiaState currentLocation) {
+    // gets a specified cell's free neighbors
+    public static Set<SquaretopiaCell> getTransitions (SquaretopiaMatrix matrix, SquaretopiaCell currentLocation) {
         int curLocRow = currentLocation.row;
         int curLocCol = currentLocation.col;
-        Set<SquaretopiaState> possibleTransitions = new HashSet<>();
-        if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the state above
-            possibleTransitions.add(new SquaretopiaState(curLocRow - 1, curLocCol));
+        Set<SquaretopiaCell> possibleTransitions = new HashSet<>();
+        if(matrix.data[curLocRow - 1][curLocCol].districtNumber == 0) { // check availability of the cell above
+            possibleTransitions.add(new SquaretopiaCell(curLocRow - 1, curLocCol));
         }
-        if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the state below
-            possibleTransitions.add(new SquaretopiaState(curLocRow + 1, curLocCol));
+        if(matrix.data[curLocRow + 1][curLocCol].districtNumber == 0) { // check availability of the cell below
+            possibleTransitions.add(new SquaretopiaCell(curLocRow + 1, curLocCol));
         }
-        if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the state to the left
-            possibleTransitions.add(new SquaretopiaState(curLocRow, curLocCol - 1));
+        if(matrix.data[curLocRow][curLocCol - 1].districtNumber == 0) { // check availability of the cell to the left
+            possibleTransitions.add(new SquaretopiaCell(curLocRow, curLocCol - 1));
         }
-        if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the state to the right
-            possibleTransitions.add(new SquaretopiaState(curLocRow, curLocCol + 1));
+        if(matrix.data[curLocRow][curLocCol + 1].districtNumber == 0) { // check availability of the cell to the right
+            possibleTransitions.add(new SquaretopiaCell(curLocRow, curLocCol + 1));
         }
         return possibleTransitions;
     }
     
-    // update the matrix
-    public static SquaretopiaMatrix updateMatrix(SquaretopiaMatrix matrix, Set<SquaretopiaState> freeStates, SquaretopiaState claimedState) {
-        // System.out.println("claimedState.row: " + claimedState.row); // delete
-        // System.out.println("claimedState.col: " + claimedState.col); // delete
-        // System.out.println("getCurrentDistrictNumber(matrix, freeStates): " + getCurrentDistrictNumber(matrix, freeStates)); // delete
-        int claimedStateDistrict = matrix.data[claimedState.row][claimedState.col].districtNumber;
-        if(claimedStateDistrict == 0) {
-            matrix.data[claimedState.row][claimedState.col].districtNumber = getCurrentDistrictNumber(matrix, freeStates);
-            matrix.data[claimedState.row][claimedState.col].checked = true;
+    // updates the matrix
+    public static SquaretopiaMatrix updateMatrix(SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells, SquaretopiaCell claimedCell) {
+        int claimedCellDistrict = matrix.data[claimedCell.row][claimedCell.col].districtNumber;
+        if(claimedCellDistrict == 0) {
+            matrix.data[claimedCell.row][claimedCell.col].districtNumber = getCurrentDistrictNumber(matrix, freeCells);
+            matrix.data[claimedCell.row][claimedCell.col].checked = true;
         } else {
-            matrix.data[claimedState.row][claimedState.col].districtNumber = 0;
-            matrix.data[claimedState.row][claimedState.col].checked = false;
+            matrix.data[claimedCell.row][claimedCell.col].districtNumber = 0;
+            matrix.data[claimedCell.row][claimedCell.col].checked = false;
         }
-        // matrix.show(); // delete
         return matrix;
     }
     
-    // returns a squaretopiaState with one neighbor if it exists 
-    public static SquaretopiaState deadEnd (SquaretopiaMatrix matrix, Set<SquaretopiaState> allPossibleTransitions) {
-        for(SquaretopiaState state : allPossibleTransitions) {
-            if(getTransitions(matrix, state).size() == 1) {
-                return state;
+    // returns a SquaretopiaCell with one neighbor if it exists 
+    public static SquaretopiaCell deadEnd (SquaretopiaMatrix matrix, Set<SquaretopiaCell> allPossibleTransitions) {
+        for(SquaretopiaCell cell : allPossibleTransitions) {
+            if(getTransitions(matrix, cell).size() == 1) {
+                return cell;
             }
         }
         return null;
     }
     
-    // returns a squaretopiaState with one neighbor if it exists 
-    public static SquaretopiaState isolatedState (SquaretopiaMatrix matrix, Set<SquaretopiaState> allPossibleTransitions) {
-        for(SquaretopiaState state : allPossibleTransitions) {
-            if(getTransitions(matrix, state).size() == 0) {
-                return state;
+    // returns a SquaretopiaCell with one neighbor if it exists 
+    public static SquaretopiaCell isolatedCell (SquaretopiaMatrix matrix, Set<SquaretopiaCell> allPossibleTransitions) {
+        for(SquaretopiaCell cell : allPossibleTransitions) {
+            if(getTransitions(matrix, cell).size() == 0) {
+                return cell;
             }
         }
         return null;
     }
     
-    // takes care of everything when claiming a free state
-    public static void claimer (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeSquares, Set<SquaretopiaState> currentDistrict, SquaretopiaState claimedState) {
-        freeSquares.remove(claimedState);
-        updateMatrix(matrix, freeSquares, claimedState);
-        currentDistrict.add(claimedState);
+    // takes care of everything when claiming a free cell
+    public static void claimer (SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells, Set<SquaretopiaCell> currentDistrict, SquaretopiaCell claimedCell) {
+        freeCells.remove(claimedCell);
+        updateMatrix(matrix, freeCells, claimedCell);
+        currentDistrict.add(claimedCell);
     }
     
-    // takes care of everything when returning an already claimed state
-    public static void returner (SquaretopiaMatrix matrix, Set<SquaretopiaState> freeSquares, Set<SquaretopiaState> currentDistrict, SquaretopiaState returnedState) {
-        freeSquares.add(returnedState);
-        currentDistrict.remove(returnedState);
-        updateMatrix(matrix, freeSquares, returnedState);
+    // takes care of everything when returning an already claimed cell
+    public static void returner (SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells, Set<SquaretopiaCell> currentDistrict, SquaretopiaCell returnedCell) {
+        freeCells.add(returnedCell);
+        currentDistrict.remove(returnedCell);
+        updateMatrix(matrix, freeCells, returnedCell);
     }
     
     // determines the recently added transitions
-    public static Set<SquaretopiaState> recentlyAddedTransitions (Set<SquaretopiaState> freeStates, Set<SquaretopiaState> transitions) {
-        Set<SquaretopiaState> recentlyAddedTransitions = new HashSet<>();
-        for(SquaretopiaState state : transitions) {
-            if(freeStates.contains(state) == false) {
-                recentlyAddedTransitions.add(state);
+    public static Set<SquaretopiaCell> recentlyAddedTransitions (Set<SquaretopiaCell> freeCells, Set<SquaretopiaCell> transitions) {
+        Set<SquaretopiaCell> recentlyAddedTransitions = new HashSet<>();
+        for(SquaretopiaCell cell : transitions) {
+            if(freeCells.contains(cell) == false) {
+                recentlyAddedTransitions.add(cell);
             }
         }
         return recentlyAddedTransitions;
