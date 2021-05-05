@@ -1,113 +1,31 @@
 package partition;
 
-import static org.junit.Assert.*;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.Timeout;
-import java.time.LocalDate;
-import java.util.*;
+
+/**
+ * Joshua Mariz 05/05/2021
+ * PartitionTests.java
+ * PartitionTests allows us to run the following classes
+ * - Partitioner.java
+ * - SingleDistricter.java
+ * - UnboundedSingleDistricter.java
+ * - WeightedPartitioner.java
+ * - WeightedSingleDistricter.java
+ * - WeightedUnboundedSingleDistricter.java
+ * <b>NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.</b>
+ */
 
 public class PartitionTests {
     
-    // =================================================
-    // Test Configuration
-    // =================================================
-    
-    // Global timeout to prevent infinite loops from
-    // crashing the test suite + to test that your
-    // constraint propagation is working...
-    // If they are, 3 seconds should be more than enough
-    // for any test
-////    @Rule
-////    public Timeout globalTimeout = Timeout.seconds(9);
-    
-//    /**
-//     * Tests whether a given solution to a CSP satisfies all constraints or not
-//     * @param soln Full instantiation of variables to assigned values, indexed by variable
-//     * @param constraints The set of constraints the solution must satisfy
-//     */
-//    public static void testSolution (List<LocalDate> soln, Set<DateConstraint> constraints) {
-//        for (DateConstraint d : constraints) {
-//            LocalDate leftDate = soln.get(d.L_VAL),
-//                      rightDate = (d.arity() == 1) 
-//                          ? ((UnaryDateConstraint) d).R_VAL 
-//                          : soln.get(((BinaryDateConstraint) d).R_VAL);
-//            
-//            boolean sat = false;
-//            switch (d.OP) {
-//            case "==": if (leftDate.isEqual(rightDate))  sat = true; break;
-//            case "!=": if (!leftDate.isEqual(rightDate)) sat = true; break;
-//            case ">":  if (leftDate.isAfter(rightDate))  sat = true; break;
-//            case "<":  if (leftDate.isBefore(rightDate)) sat = true; break;
-//            case ">=": if (leftDate.isAfter(rightDate) || leftDate.isEqual(rightDate))  sat = true; break;
-//            case "<=": if (leftDate.isBefore(rightDate) || leftDate.isEqual(rightDate)) sat = true; break;
-//            }
-//            if (!sat) {
-//                fail("[X] Constraint Failed: " + d);
-//            }
-//        }
-//    }
-    
-    
-    // =================================================
-    // Unit Tests
-    // =================================================
-    
     @Test
     public void Partition_t0() {
-//        Set<DateConstraint> constraints = new HashSet<>(
-//            Arrays.asList(
-//                new UnaryDateConstraint(0, "==", LocalDate.of(2020, 1, 3))
-//            )
-//        );
-        
-        // Date range of 2020-1-1 to 2020-1-5 in which the only meeting date
-        // for 1 meeting can be on 2020-1-3
-//        List<LocalDate> solution = CSP.solve(
-//            1,                          // Number of meetings to schedule
-//            LocalDate.of(2020, 1, 1),   // Domain start date
-//            LocalDate.of(2020, 1, 5),   // Domain end date
-//            constraints                 // Constraints all meetings must satisfy
-//        );
-        
-        
-        // Partitioner.Partition(5, 10);
-        // SingleDistricter.Partition(5, 10);
-        // UnboundedSingleDistricter.Partition(5, 3);
-        
-        // WeightedPartitioner.Partition(7, 10000, 99);
-       
-        // WeightedSingleDistricter.Partition(5, 10000,100);
-        // WeightedUnboundedSingleDistricter.Partition(5, 6, 100);
-        
-        // DraftWeightedPartitioner.Partition(5, 10, 99.99);
-        
-        
-        
-//        SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(5, 5);
-//        Squaretopia.show();
-//        System.out.println(""); // delete
-//        Squaretopia.data[1][2].districtNumber = 1;
-//        Squaretopia.data[1][2].checked = true;
-////        Squaretopia.data[1][3].districtNumber = 1;
-////        Squaretopia.data[1][3].checked = true;
-//        Squaretopia.data[3][1].districtNumber = 1;
-//        Squaretopia.data[3][1].checked = true;
-////        Squaretopia.data[2][1].districtNumber = 1;
-////        Squaretopia.data[2][1].checked = true;
-//        Squaretopia.data[2][2].districtNumber = 1;
-//        Squaretopia.data[2][2].checked = true;
-////        Squaretopia.data[2][3].districtNumber = 1;
-////        Squaretopia.data[2][3].checked = true;
-//        Squaretopia.data[1][1].districtNumber = 1;
-//        Squaretopia.data[1][1].checked = true;
-//        Squaretopia.data[3][2].districtNumber = 1;
-//        Squaretopia.data[3][2].checked = true;
-//        Squaretopia.show();
-//        System.out.println(Squaretopia.validMap(Squaretopia)); // delete
-        // Example Solution:
-        // [2020-01-03]
-        // testSolution(solution, constraints);
+        // UNCOMMENT OUT THE FILE YOU WANT TO RUN; TRY DIFFERENT ARGUMENTS
+           Partitioner.Partition(5, 2);                             // Partitioner.Partition(Squaretopia Size, Number of Partitions);
+        // SingleDistricter.Partition(5, 2);                        // SingleDistricter.Partition(Squaretopia Size, Number of Single Districts);
+        // UnboundedSingleDistricter.Partition(5, 2);               // UnboundedSingleDistricter.Partition(Squaretopia Size, Number of Single Districts);
+        // WeightedPartitioner.Partition(5, 2, 50);                 // WeightedPartitioner.Partition(Squaretopia Size, Number of Partitions, Weighting Factor Probability);
+        // WeightedSingleDistricter.Partition(5, 2, 50);            // WeightedSingleDistricter.Partition(Squaretopia Size, Number of Single Districts, Weighting Factor Probability);
+        // WeightedUnboundedSingleDistricter.Partition(5, 2, 50);   // WeightedUnboundedSingleDistricter.Partition(Squaretopia Size, Number of Single Districts, Weighting Factor Probability);
     }
     
 }
