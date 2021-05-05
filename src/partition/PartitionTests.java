@@ -12,7 +12,7 @@ import org.junit.Test;
  * - WeightedPartitioner.java
  * - WeightedSingleDistricter.java
  * - WeightedUnboundedSingleDistricter.java
- * <b>NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.</b>
+ * NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.
  */
 
 public class PartitionTests {
