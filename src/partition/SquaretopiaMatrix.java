@@ -302,5 +302,52 @@ final public class SquaretopiaMatrix {
         double averageScore = scoreTotal / numOfDistricts;
         return averageScore;
     }
+    
+    // calculates the district area to minimum bounding square ratios for all districts in a given Squaretopia 
+    public double singleReock() {
+        // locate and save extrema states
+        double scoreTotal = 0;
+        double numOfDistricts = 1;
+        SquaretopiaState[][] extrema = new SquaretopiaState[(int) numOfDistricts][4]; // each district has four states in this order min length, max length, min width, max width
+        for (int i = 1; i < data.length - 1; i++) {
+            for (int j = 1; j < data.length - 1; j++) {
+                int districtNumberOfThisState = data[i][j].districtNumber;
+                if(districtNumberOfThisState != 0) {
+                    SquaretopiaState thisState = data[i][j];
+                    if(extrema[districtNumberOfThisState - 1][0] == null) {
+                        extrema[districtNumberOfThisState - 1][0] = thisState;
+                        extrema[districtNumberOfThisState - 1][1] = thisState;
+                        extrema[districtNumberOfThisState - 1][2] = thisState;
+                        extrema[districtNumberOfThisState - 1][3] = thisState;
+                    }
+                    if(thisState.row < extrema[districtNumberOfThisState - 1][0].row) {
+                        extrema[districtNumberOfThisState - 1][0] = thisState;
+                    }
+                    if(thisState.row > extrema[districtNumberOfThisState - 1][1].row) {
+                        extrema[districtNumberOfThisState - 1][1] = thisState;
+                    }
+                    if(thisState.col < extrema[districtNumberOfThisState - 1][2].col) {
+                        extrema[districtNumberOfThisState - 1][2] = thisState;
+                    }
+                    if(thisState.col > extrema[districtNumberOfThisState - 1][3].col) {
+                        extrema[districtNumberOfThisState - 1][3] = thisState;
+                    }
+                }
+            }
+        }
+        double length;
+        double width;
+        for (int i = 0; i < extrema.length; i++) {
+            length = Math.abs(extrema[i][0].row - extrema[i][1].row) + 1; // add one to count properly
+            width = Math.abs(extrema[i][2].col - extrema[i][3].col) + 1;
+            if (length < width) {
+                scoreTotal += (data.length - 2) / (width * width);
+            } else {
+                scoreTotal += (data.length - 2) / (length * length);
+            }
+        }
+        double averageScore = scoreTotal / numOfDistricts;
+        return averageScore;
+    }
 
 }
