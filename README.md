@@ -1,3 +1,4 @@
+ **Sampling Compactness Scores to Detect Gerrymandering in Squaretopia**  
  Joshua Mariz  
  05/05/2021  
    
