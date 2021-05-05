@@ -1,27 +1,27 @@
 package partition;
 
 /**
- * Joshua Mariz
- * Squaretopia state representation of a given cell in an n by n square grid
+ * Joshua Mariz 05/05/2021
+ * Squaretopia cell representation of a given cell in an n by n square grid
  */
-public class SquaretopiaState {
+public class SquaretopiaCell {
     
     public int row;
     public int col;
     public int districtNumber;
     public boolean checked; // used when checking for the validity of a district assignment
-    public int direction; // relative to parent, this state is in this direction
+    public int direction; // relative to parent, this cell is in this direction
                           // where -1 is not yet defined, 1 is above, 2 is right, 3 is below, 4 is left
     public double lowerBoundForProbability; // used in weighted partitioning
     public double upperBoundForProbability; // used in weighted partitioning
     
     /**
-     * Constructs a new SquaretopiaState, which tracks the given row and column that it
-     * represents in the Squaretopia.<br>
-     * @param row Integer row number of this state (the top row is the first row)
-     * @param col Integer column number of this state (the leftmost column is the first column)
+     * Constructs a new SquaretopiaCell, which tracks the given row and column that it
+     * represents in the Squaretopia.
+     * @param row Integer row number of this cell (the top row is the first row)
+     * @param col Integer column number of this cell (the leftmost column is the first column)
      */
-    SquaretopiaState (int row, int col) {
+    SquaretopiaCell (int row, int col) {
         this.row = row;
         this.col = col;
         this.districtNumber = 0;
@@ -32,8 +32,8 @@ public class SquaretopiaState {
     
     @Override
     public boolean equals (Object other) {
-        return other instanceof SquaretopiaState 
-            ? this.row == ((SquaretopiaState) other).row && this.col == ((SquaretopiaState) other).col
+        return other instanceof SquaretopiaCell 
+            ? this.row == ((SquaretopiaCell) other).row && this.col == ((SquaretopiaCell) other).col
             : false;
     }
     
