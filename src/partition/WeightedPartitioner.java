@@ -6,54 +6,53 @@ import java.util.Set;
 
 /**
  * Joshua Mariz 05/05/2021
- * WeightedSingleDistricter.java
- * WeightedSingleDistricter utilizes a weighting factor probability to generate a district of size n in an n by n Squaretopia
+ * WeightedPartitioner.java
+ * WeightedPartitioner utilizes a weighting factor probability to partition an n by n Squaretopia into n equally sized contiguous districts
  */
-public class WeightedSingleDistricter {
+public class WeightedPartitioner {
     
     /**
-     * Prepares the Squaretopia weighted single-districting process.
+     * Prepares the Squaretopia weighted partitioning process.
      * <b>NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.</b>
      * @param size Integer number of the Squaretopia's size
-     * @param numOfTrials Integer number for the number of single districts we will generate
+     * @param numOfTrials Integer number for the number of Squaretopias we will partition
      * @param probability Double value for our weighting factor probability
      * @return void
      */
     public static void Partition (int size, int numOfTrials, double probability) {
-        int adjustedSize = size + 2;
+        int adjustedSize = size + 2; // includes the outer layer of padding cells
         int trialsConducted = 0;
+        Boolean isValidPartition;
         while(trialsConducted < numOfTrials) {
-            Boolean isValidPartition = true;
+            isValidPartition = true;
             SquaretopiaMatrix Squaretopia = new SquaretopiaMatrix(adjustedSize, adjustedSize);
-            Set<SquaretopiaCell> freeCells = Squaretopia.generateSetOfFreeCells();
+            Set<SquaretopiaCell> freeCell = Squaretopia.generateSetOfFreeCells();
             Set<SquaretopiaCell> currentDistrict = new HashSet<>();
             Set<SquaretopiaCell> currentDistrictFreeNeighbors = new HashSet<>();
             Set<SquaretopiaCell> recentlyAddedTransitions = new HashSet<>();
             SquaretopiaCell claimedCell;
-            while(freeCells.size() > (size * size - size)) { // we only need to generate one district
-                claimedCell = deadEnd(Squaretopia, freeCells);
+            while(freeCell.size() > 0) {
+                claimedCell = deadEnd(Squaretopia, freeCell);
                 if(claimedCell == null) {
-                    claimedCell = randomCell(freeCells, null, probability);
+                    claimedCell = randomCell(freeCell, null, probability);
                 }
-                claimer(Squaretopia, freeCells, currentDistrict, claimedCell);
-                
+                claimer(Squaretopia, freeCell, currentDistrict, claimedCell);
                 currentDistrictFreeNeighbors.addAll(getTransitions(Squaretopia, claimedCell));
                 recentlyAddedTransitions.addAll(getTransitions(Squaretopia, claimedCell));
-                if (recursiveDistricter(Squaretopia, freeCells, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions, claimedCell, probability) == null) {
+                if (recursiveDistricter(Squaretopia, freeCell, currentDistrict, currentDistrictFreeNeighbors, recentlyAddedTransitions, claimedCell, probability) == null) {
                     isValidPartition = false;
                     break;
                 }
                 currentDistrict.clear();
                 currentDistrictFreeNeighbors.clear();
             }
-            if(isValidPartition) {
+            if(isValidPartition) { // output partition and rounded compactness scores (LW RE SB PP)
+                // COMMENT OUT THE LINE BELOW TO NOT OUTPUT THE PARTITIONED SQUARETOPIA
                 Squaretopia.show();
-                // UNCOMMENT OUT THE LINE BELOW TO OUTPUT THE REOCK SCORES OF THE SINGLE DISTRICTS
-                // System.out.println(Math.round(Squaretopia.singleReock()*100));
+                // COMMENT OUT THE LINE BELOW TO NOT OUTPUT THE SCORES OF THE PARTITIONED SQUARETOPIA
+                System.out.println(Math.round(Squaretopia.LengthWidth()*100) + " " + Math.round(Squaretopia.Reock()*100) + " " + Math.round(Squaretopia.Schwartzberg()*100) + " " + Math.round(Squaretopia.PolsbyPopper()*100));
                 System.out.println("");
                 trialsConducted++;
-            } else {
-                isValidPartition = true;
             }
         }
         
@@ -62,7 +61,13 @@ public class WeightedSingleDistricter {
     // recursive algorithm
     public static SquaretopiaMatrix recursiveDistricter (SquaretopiaMatrix matrix, Set<SquaretopiaCell> freeCells, Set<SquaretopiaCell> currentDistrict, Set<SquaretopiaCell> allPossibleTransitions, Set<SquaretopiaCell> recentlyAddedTransitions, SquaretopiaCell recentlyAddedCell, double probability) {
           if(currentDistrict.size() == (matrix.data.length - 2)) { // assumes matrix is a square!
-              return matrix;
+              if(matrix.validMap()) {
+                  recentlyAddedTransitions.clear();
+                  return matrix;
+              } else {
+                  allPossibleTransitions.removeAll(recentlyAddedTransitions);
+                  return null;
+              }
           }
           
           Set<SquaretopiaCell> newAllPossibleNeighbors = new HashSet<>();
