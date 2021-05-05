@@ -13,7 +13,7 @@ public class WeightedPartitioner {
     
     /**
      * Prepares the Squaretopia weighted partitioning process.
-     * <b>NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.</b>
+     * NOTE: The weighting factor probability argument must be greater than or equal to 0 AND less than or equal to 100.
      * @param size Integer number of the Squaretopia's size
      * @param numOfTrials Integer number for the number of Squaretopias we will partition
      * @param probability Double value for our weighting factor probability
